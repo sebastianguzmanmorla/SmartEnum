@@ -12,9 +12,7 @@ NUGET_SOURCE=https://api.nuget.org/v3/index.json
 # Detección de versión
 VERSION=$(shell dotnet msbuild $(PROJECT_PATH) -nologo -t:PrintVersion -v:q 2>&1 | tail -1 | awk '{print $$NF}')
 
-.PHONY: all clean pack push version check-env
-
-all: pack
+.PHONY: clean pack push version check-env
 
 version:
 	@echo "Versión detectada: $(VERSION)"
