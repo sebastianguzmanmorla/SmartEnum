@@ -136,7 +136,7 @@ Para flags:
 configurationBuilder.Properties<PermissionSet>()
     .HaveConversion<SmartEnumFlagsValueConverter<PermissionSet, Permission, string>,
         SmartEnumFlagsValueComparer<PermissionSet, Permission, string>>()
-    .HaveColumnType("text[]");
+    .HaveColumnType("text");
 ```
 
 ## Excepciones

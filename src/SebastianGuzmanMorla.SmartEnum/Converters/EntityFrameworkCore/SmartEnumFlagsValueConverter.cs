@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
 
-public sealed class SmartEnumFlagsValueConverter<TFlags, TEnum, TValue>() : ValueConverter<TFlags, TValue[]>
+public sealed class SmartEnumFlagsValueConverter<TFlags, TEnum, TValue>() : ValueConverter<TFlags, string>
 (
-    enumFlags => enumFlags.ToValueArray(),
+    enumFlags => enumFlags.ToString(),
     value => SmartEnumFlags<TFlags, TEnum, TValue>.Parse(value)
 )
     where TFlags : SmartEnumFlags<TFlags, TEnum, TValue>, new()
