@@ -148,4 +148,17 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
     {
         return ((TFlags)a).CloneRemove(b);
     }
+
+    public static bool operator ==(SmartEnumFlags<TFlags, TEnum, TValue> left, SmartEnumFlags<TFlags, TEnum, TValue> right)
+    {
+        if (ReferenceEquals(left, right))
+            return true;
+
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(SmartEnumFlags<TFlags, TEnum, TValue> left, SmartEnumFlags<TFlags, TEnum, TValue> right)
+    {
+        return !(left == right);
+    }
 }
