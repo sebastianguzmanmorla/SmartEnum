@@ -84,7 +84,7 @@ public class PermissionSet : SmartEnumFlags<PermissionSet, Permission, string>
     public PermissionSet() { }
 }
 
-var flags = PermissionSet.Parse(new[] { "read", "write" });
+var flags = PermissionSet.Parse(["read", "write"]);
 if (flags.Has(Permission.Read))
 {
     Console.WriteLine("Tiene permiso de lectura");

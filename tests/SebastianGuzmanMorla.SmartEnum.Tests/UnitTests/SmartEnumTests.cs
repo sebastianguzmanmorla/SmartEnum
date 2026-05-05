@@ -123,4 +123,73 @@ public class SmartEnumTests
         // Assert
         hash1.Should().Be(hash2);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("   ")]
+    public void Parse_EmptyOrWhitespaceString_ThrowsSmartEnumException(string value)
+    {
+        // Act
+        Action act = () => TestStatus.Parse(value);
+
+        // Assert
+        act.Should().Throw<SmartEnumException>()
+            .WithMessage($"{typeof(TestStatus).Name} cannot be null or empty.");
+    }
+
+    [Fact]
+    public void Parse_CaseInsensitiveString_ReturnsCorrectInstance()
+    {
+        // Arrange
+        var value = "aCtIvE";
+        var expected = TestStatus.Active;
+
+        // Act
+        var result = TestStatus.Parse(value);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Equals_WithNullOrDifferentType_ReturnsFalse()
+    {
+        // Arrange
+        var status = TestStatus.Active;
+
+        // Act & Assert
+        status.Equals(null).Should().BeFalse();
+        status.Equals("Active").Should().BeFalse();
+    }
+
+    [Fact]
+    public void Operator_Equals_WithNull_ReturnsCorrectResult()
+    {
+        // Arrange
+        TestStatus? status1 = null;
+        TestStatus? status2 = null;
+        var status3 = TestStatus.Active;
+
+        // Act & Assert
+        (status1 == status2).Should().BeTrue();
+        (status1 == status3).Should().BeFalse();
+        (status3 == status1).Should().BeFalse();
+        (status1 != status2).Should().BeFalse();
+        (status1 != status3).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Operator_Equals_SymmetricWithTValue_Works()
+    {
+        // Arrange
+        var status = TestStatus.Active;
+        string value = "Active";
+
+        // Act & Assert
+        (value == status).Should().BeTrue();
+        (status == value).Should().BeTrue();
+        (value != status).Should().BeFalse();
+        (status != value).Should().BeFalse();
+    }
 }

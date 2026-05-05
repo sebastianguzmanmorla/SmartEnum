@@ -262,10 +262,22 @@ public class SmartEnumFlagsTests
     }
 
     [Fact]
-    public void Parse_WithNullInput_ThrowsSmartEnumException()
+    public void Parse_WithNullInput_ReturnsEmptyFlags()
     {
-        // Arrange & Assert
-        FluentActions.Invoking(() => TestPermissionFlags.Parse("Read Write"))
-            .Should().NotThrow(); // Should work with multiple explicit values
+        // Act
+        var result = TestPermissionFlags.Parse((string?)null);
+
+        // Assert
+        result.Flags.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Parse_WithEmptyString_ReturnsEmptyFlags()
+    {
+        // Act
+        var result = TestPermissionFlags.Parse("   ");
+
+        // Assert
+        result.Flags.Should().BeEmpty();
     }
 }

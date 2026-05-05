@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>SebastianGuzmanMorla.SmartEnum</PackageId>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
         <Authors>Sebastián Guzmán Morla</Authors>
         <Description>Implementación de SmartEnums con Source Generators.</Description>
         <PackageProjectUrl>https://github.com/sebastianguzmanmorla/SmartEnum</PackageProjectUrl>
