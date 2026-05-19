@@ -1,5 +1,3 @@
-using AutoFixture.Xunit2;
-using SebastianGuzmanMorla.SmartEnum.Attributes;
 using SebastianGuzmanMorla.SmartEnum.Tests.Types;
 
 namespace SebastianGuzmanMorla.SmartEnum.Tests.UnitTests;

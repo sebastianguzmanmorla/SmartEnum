@@ -1,5 +1,3 @@
-using System.Text.Json;
-using SebastianGuzmanMorla.SmartEnum.Attributes;
 using SebastianGuzmanMorla.SmartEnum.Tests.Types;
 
 namespace SebastianGuzmanMorla.SmartEnum.Tests.UnitTests;

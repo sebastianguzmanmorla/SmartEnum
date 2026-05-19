@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SebastianGuzmanMorla.SmartEnum.Attributes;
 using SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
 using SebastianGuzmanMorla.SmartEnum.Tests.Types;
 

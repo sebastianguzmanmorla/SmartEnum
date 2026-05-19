@@ -8,7 +8,7 @@ public abstract class SmartEnum<TEnum, TValue>(TValue value)
     where TEnum : SmartEnum<TEnum, TValue>
     where TValue : notnull
 {
-    private static readonly Lock Lock = new();
+    private static readonly object Lock = new();
 
     protected static FrozenDictionary<TValue, TEnum>? Lookup;
     public TValue Value { get; } = value;

@@ -400,3 +400,4 @@ FodyWeavers.xsd
 global.json
 .env
 *.bundle.*
+.vscode/

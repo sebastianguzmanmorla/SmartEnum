@@ -21,9 +21,9 @@ dotnet add package SebastianGuzmanMorla.SmartEnum
 
 ## Compatibilidad
 
-- Target framework: `net10.0`
+- Target frameworks: `net8.0`, `net9.0`, `net10.0`
 - Generador de código: compatible con `netstandard2.0`
-- Dependencia de EF Core: `Microsoft.EntityFrameworkCore` v10.0.6
+- Dependencia de EF Core: `Microsoft.EntityFrameworkCore` (>= v8.0.0)
 
 ## Uso básico
 
