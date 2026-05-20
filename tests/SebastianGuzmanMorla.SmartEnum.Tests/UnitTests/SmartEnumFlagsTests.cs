@@ -8,11 +8,11 @@ public class SmartEnumFlagsTests
     public void Constructor_WithFlags_SetsFlagsCorrectly()
     {
         // Arrange
-        var read = TestPermission.Read;
-        var write = TestPermission.Write;
+        TestPermission read = TestPermission.Read;
+        TestPermission write = TestPermission.Write;
 
         // Act
-        var flags = new TestPermissionFlags(read, write);
+        TestPermissionFlags flags = new TestPermissionFlags(read, write);
 
         // Assert
         flags.Flags.Should().Contain(read);
@@ -24,10 +24,10 @@ public class SmartEnumFlagsTests
     public void Parse_SingleValue_ReturnsCorrectFlags()
     {
         // Arrange
-        var expected = TestPermission.Read;
+        TestPermission expected = TestPermission.Read;
 
         // Act
-        var result = TestPermissionFlags.Parse(expected.Value);
+        TestPermissionFlags result = TestPermissionFlags.Parse(expected.Value);
 
         // Assert
         result.Flags.Should().ContainSingle().Which.Should().Be(expected);
@@ -37,11 +37,11 @@ public class SmartEnumFlagsTests
     public void Parse_MultipleValues_ReturnsCorrectFlags()
     {
         // Arrange
-        var read = TestPermission.Read;
-        var write = TestPermission.Write;
+        TestPermission read = TestPermission.Read;
+        TestPermission write = TestPermission.Write;
 
         // Act
-        var result = TestPermissionFlags.Parse($"{read.Value} {write.Value}");
+        TestPermissionFlags result = TestPermissionFlags.Parse($"{read.Value} {write.Value}");
 
         // Assert
         result.Flags.Should().Contain(read);
@@ -53,10 +53,10 @@ public class SmartEnumFlagsTests
     public void Parse_ArrayValues_ReturnsCorrectFlags()
     {
         // Arrange
-        var values = new[] { "Read", "Write" };
+        string[] values = ["Read", "Write"];
 
         // Act
-        var result = TestPermissionFlags.Parse(values);
+        TestPermissionFlags result = TestPermissionFlags.Parse(values);
 
         // Assert
         result.Flags.Should().HaveCount(2);
@@ -68,11 +68,11 @@ public class SmartEnumFlagsTests
     public void Has_FlagExists_ReturnsTrue()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var hasRead = flags.Has(TestPermission.Read);
-        var hasExecute = flags.Has(TestPermission.Execute);
+        bool hasRead = flags.Has(TestPermission.Read);
+        bool hasExecute = flags.Has(TestPermission.Execute);
 
         // Assert
         hasRead.Should().BeTrue();
@@ -83,11 +83,11 @@ public class SmartEnumFlagsTests
     public void ContainsAll_AllFlagsPresent_ReturnsTrue()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write, TestPermission.Execute);
-        var subset = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write, TestPermission.Execute);
+        TestPermissionFlags subset = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var containsAll = flags.ContainsAll(subset);
+        bool containsAll = flags.ContainsAll(subset);
 
         // Assert
         containsAll.Should().BeTrue();
@@ -97,11 +97,11 @@ public class SmartEnumFlagsTests
     public void ContainsAll_NotAllFlagsPresent_ReturnsFalse()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
-        var largerSet = new TestPermissionFlags(TestPermission.Read, TestPermission.Write, TestPermission.Execute);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags largerSet = new TestPermissionFlags(TestPermission.Read, TestPermission.Write, TestPermission.Execute);
 
         // Act
-        var containsAll = flags.ContainsAll(largerSet);
+        bool containsAll = flags.ContainsAll(largerSet);
 
         // Assert
         containsAll.Should().BeFalse();
@@ -111,11 +111,11 @@ public class SmartEnumFlagsTests
     public void EqualsAll_SameFlags_ReturnsTrue()
     {
         // Arrange
-        var flags1 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
-        var flags2 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags1 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags2 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var equals = flags1.EqualsAll(TestPermission.Read, TestPermission.Write);
+        bool equals = flags1.EqualsAll(TestPermission.Read, TestPermission.Write);
 
         // Assert
         equals.Should().BeTrue();
@@ -125,7 +125,7 @@ public class SmartEnumFlagsTests
     public void Add_IncreasesFlagCount()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read);
 
         // Act
         flags.Add(TestPermission.Write);
@@ -140,7 +140,7 @@ public class SmartEnumFlagsTests
     public void Remove_DecreasesFlagCount()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
         flags.Remove(TestPermission.Read);
@@ -153,10 +153,10 @@ public class SmartEnumFlagsTests
     public void CloneAdd_ReturnsNewInstanceWithAddedFlag()
     {
         // Arrange
-        var original = new TestPermissionFlags(TestPermission.Read);
+        TestPermissionFlags original = new TestPermissionFlags(TestPermission.Read);
 
         // Act
-        var cloned = original.CloneAdd(TestPermission.Write);
+        TestPermissionFlags cloned = original.CloneAdd(TestPermission.Write);
 
         // Assert
         original.Flags.Should().ContainSingle().Which.Should().Be(TestPermission.Read);
@@ -169,10 +169,10 @@ public class SmartEnumFlagsTests
     public void CloneRemove_ReturnsNewInstanceWithRemovedFlag()
     {
         // Arrange
-        var original = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags original = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var cloned = original.CloneRemove(TestPermission.Read);
+        TestPermissionFlags cloned = original.CloneRemove(TestPermission.Read);
 
         // Assert
         original.Flags.Should().HaveCount(2);
@@ -183,10 +183,10 @@ public class SmartEnumFlagsTests
     public void Operator_Plus_AddsFlag()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read);
 
         // Act
-        var result = flags | TestPermission.Write;
+        TestPermissionFlags result = flags | TestPermission.Write;
 
         // Assert
         result.Flags.Should().HaveCount(2);
@@ -198,10 +198,10 @@ public class SmartEnumFlagsTests
     public void Operator_Minus_RemovesFlag()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var result = flags - TestPermission.Read;
+        TestPermissionFlags result = flags - TestPermission.Read;
 
         // Assert
         result.Flags.Should().ContainSingle().Which.Should().Be(TestPermission.Write);
@@ -211,10 +211,10 @@ public class SmartEnumFlagsTests
     public void ToString_ReturnsSpaceSeparatedValues()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var result = flags.ToString();
+        string result = flags.ToString();
 
         // Assert
         result.Should().Be("Read Write");
@@ -224,10 +224,10 @@ public class SmartEnumFlagsTests
     public void ToValueArray_ReturnsOrderedValues()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Write, TestPermission.Read); // Order doesn't matter
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Write, TestPermission.Read); // Order doesn't matter
 
         // Act
-        var values = flags.ToValueArray();
+        string[] values = flags.ToValueArray();
 
         // Assert
         values.Should().Equal("Read", "Write"); // Ordered by Value
@@ -237,9 +237,9 @@ public class SmartEnumFlagsTests
     public void Equality_WorksCorrectly()
     {
         // Arrange
-        var flags1 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
-        var flags2 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
-        var flags3 = new TestPermissionFlags(TestPermission.Read);
+        TestPermissionFlags flags1 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags2 = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags3 = new TestPermissionFlags(TestPermission.Read);
 
         // Act & Assert
         flags1.Equals(flags2).Should().BeTrue();
@@ -263,7 +263,7 @@ public class SmartEnumFlagsTests
     public void Parse_WithNullInput_ReturnsEmptyFlags()
     {
         // Act
-        var result = TestPermissionFlags.Parse((string?)null);
+        TestPermissionFlags result = TestPermissionFlags.Parse((string?)null);
 
         // Assert
         result.Flags.Should().BeEmpty();
@@ -273,7 +273,7 @@ public class SmartEnumFlagsTests
     public void Parse_WithEmptyString_ReturnsEmptyFlags()
     {
         // Act
-        var result = TestPermissionFlags.Parse("   ");
+        TestPermissionFlags result = TestPermissionFlags.Parse("   ");
 
         // Assert
         result.Flags.Should().BeEmpty();

@@ -19,10 +19,10 @@ public class JsonConvertersTests
     public void SmartEnumJsonConverter_Serialize_ReturnsValueAsString()
     {
         // Arrange
-        var status = TestStatus.Active;
+        TestStatus status = TestStatus.Active;
 
         // Act
-        var json = JsonSerializer.Serialize(status, _options);
+        string json = JsonSerializer.Serialize(status, _options);
 
         // Assert
         json.Should().Be("\"Active\"");
@@ -32,10 +32,10 @@ public class JsonConvertersTests
     public void SmartEnumJsonConverter_Deserialize_ValidValue_ReturnsCorrectInstance()
     {
         // Arrange
-        var json = "\"Active\"";
+        string json = "\"Active\"";
 
         // Act
-        var result = JsonSerializer.Deserialize<TestStatus>(json, _options);
+        TestStatus? result = JsonSerializer.Deserialize<TestStatus>(json, _options);
 
         // Assert
         result.Should().Be(TestStatus.Active);
@@ -45,10 +45,10 @@ public class JsonConvertersTests
     public void SmartEnumJsonConverter_Deserialize_Null_ReturnsNull()
     {
         // Arrange
-        var json = "null";
+        string json = "null";
 
         // Act
-        var result = JsonSerializer.Deserialize<TestStatus?>(json, _options);
+        TestStatus? result = JsonSerializer.Deserialize<TestStatus?>(json, _options);
 
         // Assert
         result.Should().BeNull();
@@ -58,7 +58,7 @@ public class JsonConvertersTests
     public void SmartEnumJsonConverter_Deserialize_InvalidValue_ThrowsSmartEnumException()
     {
         // Arrange
-        var json = "\"Invalid\"";
+        string json = "\"Invalid\"";
 
         // Act
         Action act = () => JsonSerializer.Deserialize<TestStatus>(json, _options);
@@ -71,10 +71,10 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Serialize_ReturnsSpaceSeparatedValues()
     {
         // Arrange
-        var flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
+        TestPermissionFlags flags = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
 
         // Act
-        var json = JsonSerializer.Serialize(flags, _options);
+        string json = JsonSerializer.Serialize(flags, _options);
 
         // Assert
         json.Should().Be("\"Read Write\"");
@@ -84,14 +84,14 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Deserialize_String_ReturnsCorrectFlags()
     {
         // Arrange
-        var json = "\"Read Write\"";
+        string json = "\"Read Write\"";
 
         // Act
-        var result = JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
+        TestPermissionFlags? result = JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
 
         // Assert
         result.Should().NotBeNull();
-        result!.Flags.Should().HaveCount(2);
+        result.Flags.Should().HaveCount(2);
         result.Flags.Should().Contain(TestPermission.Read);
         result.Flags.Should().Contain(TestPermission.Write);
     }
@@ -100,14 +100,14 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Deserialize_Array_ReturnsCorrectFlags()
     {
         // Arrange
-        var json = "[\"Read\", \"Write\"]";
+        string json = "[\"Read\", \"Write\"]";
 
         // Act
-        var result = JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
+        TestPermissionFlags? result = JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
 
         // Assert
         result.Should().NotBeNull();
-        result!.Flags.Should().HaveCount(2);
+        result.Flags.Should().HaveCount(2);
         result.Flags.Should().Contain(TestPermission.Read);
         result.Flags.Should().Contain(TestPermission.Write);
     }
@@ -116,10 +116,10 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Deserialize_Null_ReturnsNull()
     {
         // Arrange
-        var json = "null";
+        string json = "null";
 
         // Act
-        var result = JsonSerializer.Deserialize<TestPermissionFlags?>(json, _options);
+        TestPermissionFlags? result = JsonSerializer.Deserialize<TestPermissionFlags?>(json, _options);
 
         // Assert
         result.Should().BeNull();
@@ -129,7 +129,7 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Deserialize_InvalidFormat_ThrowsSmartEnumException()
     {
         // Arrange
-        var json = "\"Invalid\"";
+        string json = "\"Invalid\"";
 
         // Act
         Action act = () => JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
@@ -142,7 +142,7 @@ public class JsonConvertersTests
     public void SmartEnumFlagsJsonConverter_Deserialize_InvalidArrayElement_ThrowsJsonException()
     {
         // Arrange
-        var json = "[\"Read\", \"Invalid\"]";
+        string json = "[\"Read\", \"Invalid\"]";
 
         // Act
         Action act = () => JsonSerializer.Deserialize<TestPermissionFlags>(json, _options);
@@ -155,7 +155,7 @@ public class JsonConvertersTests
     public void SmartEnumJsonConverter_Deserialize_Whitespace_ShouldThrow()
     {
         // Arrange
-        var json = "\"   \"";
+        string json = "\"   \"";
 
         // Act
         Action act = () => JsonSerializer.Deserialize<TestStatus>(json, _options);

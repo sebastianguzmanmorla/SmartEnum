@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
 using SebastianGuzmanMorla.SmartEnum.Tests.Types;
 
@@ -50,7 +51,7 @@ public class EfCoreIntegrationTests : IDisposable
     public async Task SmartEnum_SaveAndRetrieve_WorksCorrectly()
     {
         // Arrange
-        var entity = new TestEntity
+        TestEntity entity = new TestEntity
         {
             Name = "Test Entity",
             Status = TestStatus.Active
@@ -60,11 +61,11 @@ public class EfCoreIntegrationTests : IDisposable
         _context.Entities.Add(entity);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.Entities.FindAsync(entity.Id);
+        TestEntity? retrieved = await _context.Entities.FindAsync(entity.Id);
 
         // Assert
         retrieved.Should().NotBeNull();
-        retrieved!.Status.Should().Be(TestStatus.Active);
+        retrieved.Status.Should().Be(TestStatus.Active);
         retrieved.Status.Value.Should().Be("Active");
     }
 
@@ -72,14 +73,14 @@ public class EfCoreIntegrationTests : IDisposable
     public async Task SmartEnum_QueryByValue_WorksCorrectly()
     {
         // Arrange
-        var entity1 = new TestEntity { Name = "Entity1", Status = TestStatus.Active };
-        var entity2 = new TestEntity { Name = "Entity2", Status = TestStatus.Inactive };
+        TestEntity entity1 = new TestEntity { Name = "Entity1", Status = TestStatus.Active };
+        TestEntity entity2 = new TestEntity { Name = "Entity2", Status = TestStatus.Inactive };
 
         _context.Entities.AddRange(entity1, entity2);
         await _context.SaveChangesAsync();
 
         // Act
-        var activeEntities = await _context.Entities
+        List<TestEntity> activeEntities = await _context.Entities
             .Where(e => e.Status == TestStatus.Active)
             .ToListAsync();
 
@@ -92,7 +93,7 @@ public class EfCoreIntegrationTests : IDisposable
     public async Task SmartEnumFlags_SaveAndRetrieve_WorksCorrectly()
     {
         // Arrange
-        var entity = new TestEntity
+        TestEntity entity = new TestEntity
         {
             Name = "Test Entity",
             Permissions = new TestPermissionFlags(TestPermission.Read, TestPermission.Write)
@@ -102,11 +103,11 @@ public class EfCoreIntegrationTests : IDisposable
         _context.Entities.Add(entity);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.Entities.FindAsync(entity.Id);
+        TestEntity? retrieved = await _context.Entities.FindAsync(entity.Id);
 
         // Assert
         retrieved.Should().NotBeNull();
-        retrieved!.Permissions.Flags.Should().HaveCount(2);
+        retrieved.Permissions.Flags.Should().HaveCount(2);
         retrieved.Permissions.Flags.Should().Contain(TestPermission.Read);
         retrieved.Permissions.Flags.Should().Contain(TestPermission.Write);
     }
@@ -115,12 +116,12 @@ public class EfCoreIntegrationTests : IDisposable
     public async Task SmartEnumFlags_QueryByFlags_WorksCorrectly()
     {
         // Arrange
-        var entity1 = new TestEntity
+        TestEntity entity1 = new TestEntity
         {
             Name = "Entity1",
             Permissions = new TestPermissionFlags(TestPermission.Read)
         };
-        var entity2 = new TestEntity
+        TestEntity entity2 = new TestEntity
         {
             Name = "Entity2",
             Permissions = new TestPermissionFlags(TestPermission.Read, TestPermission.Write)
@@ -130,27 +131,27 @@ public class EfCoreIntegrationTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act - This is a simplified query; in real scenarios, you might need custom SQL
-        var entitiesWithRead = await _context.Entities
+        List<TestEntity> entitiesWithRead = await _context.Entities
             .ToListAsync(); // Load all and filter in memory
 
-        var filtered = entitiesWithRead.Where(e => e.Permissions.Has(TestPermission.Read)).ToList();
+        List<TestEntity> filtered = entitiesWithRead.Where(e => e.Permissions.Has(TestPermission.Read)).ToList();
 
         // Assert
         filtered.Should().HaveCount(2);
-        filtered.Select(e => e.Id).Should().Contain(new[] { entity1.Id, entity2.Id });
+        filtered.Select(e => e.Id).Should().Contain([entity1.Id, entity2.Id]);
     }
 
     [Fact]
     public async Task ChangeTracking_WorksWithSmartEnum()
     {
         // Arrange
-        var entity = new TestEntity { Name = "Test", Status = TestStatus.Active };
+        TestEntity entity = new TestEntity { Name = "Test", Status = TestStatus.Active };
         _context.Entities.Add(entity);
         await _context.SaveChangesAsync();
 
         // Act
         entity.Status = TestStatus.Inactive;
-        var changes = _context.ChangeTracker.Entries<TestEntity>()
+        List<EntityEntry<TestEntity>> changes = _context.ChangeTracker.Entries<TestEntity>()
             .Where(e => e.State == EntityState.Modified)
             .ToList();
 
@@ -158,7 +159,7 @@ public class EfCoreIntegrationTests : IDisposable
         changes.Should().ContainSingle();
         await _context.SaveChangesAsync();
 
-        var updated = await _context.Entities.FindAsync(entity.Id);
+        TestEntity? updated = await _context.Entities.FindAsync(entity.Id);
         updated!.Status.Should().Be(TestStatus.Inactive);
     }
 
@@ -166,7 +167,7 @@ public class EfCoreIntegrationTests : IDisposable
     public async Task ChangeTracking_WorksWithSmartEnumFlags()
     {
         // Arrange
-        var entity = new TestEntity
+        TestEntity entity = new TestEntity
         {
             Name = "Test",
             Permissions = new TestPermissionFlags(TestPermission.Read)
@@ -176,7 +177,7 @@ public class EfCoreIntegrationTests : IDisposable
 
         // Act
         entity.Permissions = new TestPermissionFlags(TestPermission.Read, TestPermission.Write);
-        var changes = _context.ChangeTracker.Entries<TestEntity>()
+        List<EntityEntry<TestEntity>> changes = _context.ChangeTracker.Entries<TestEntity>()
             .Where(e => e.State == EntityState.Modified)
             .ToList();
 
@@ -184,7 +185,7 @@ public class EfCoreIntegrationTests : IDisposable
         changes.Should().ContainSingle();
         await _context.SaveChangesAsync();
 
-        var updated = await _context.Entities.FindAsync(entity.Id);
+        TestEntity? updated = await _context.Entities.FindAsync(entity.Id);
         updated!.Permissions.Flags.Should().HaveCount(2);
     }
 }

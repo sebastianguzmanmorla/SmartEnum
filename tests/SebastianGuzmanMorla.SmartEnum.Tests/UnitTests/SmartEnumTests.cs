@@ -8,11 +8,11 @@ public class SmartEnumTests
     public void Parse_ValidValue_ReturnsCorrectInstance()
     {
         // Arrange
-        var value = "Active";
-        var expected = TestStatus.Active;
+        string value = "Active";
+        TestStatus expected = TestStatus.Active;
 
         // Act
-        var result = TestStatus.Parse(value);
+        TestStatus result = TestStatus.Parse(value);
 
         // Assert
         result.Should().Be(expected);
@@ -22,14 +22,14 @@ public class SmartEnumTests
     public void Parse_InvalidValue_ThrowsSmartEnumException()
     {
         // Arrange
-        var invalidValue = "Invalid";
+        string invalidValue = "Invalid";
 
         // Act
         Action act = () => TestStatus.Parse(invalidValue);
 
         // Assert
         act.Should().Throw<SmartEnumException>()
-            .WithMessage($"Invalid {typeof(TestStatus).Name}: {invalidValue}");
+            .WithMessage($"Invalid {nameof(TestStatus)}: {invalidValue}");
     }
 
     [Theory]
@@ -38,14 +38,14 @@ public class SmartEnumTests
     public void TryParse_ValidAndInvalidValues_ReturnsExpectedResult(string value, bool expectedSuccess)
     {
         // Arrange & Act
-        var success = TestStatus.TryParse(value, out var result);
+        bool success = TestStatus.TryParse(value, out TestStatus? result);
 
         // Assert
         success.Should().Be(expectedSuccess);
         if (expectedSuccess)
         {
             result.Should().NotBeNull();
-            result!.Value.Should().Be(value);
+            result.Value.Should().Be(value);
         }
         else
         {
@@ -57,10 +57,10 @@ public class SmartEnumTests
     public void Keys_ReturnsAllDefinedValues()
     {
         // Arrange
-        var expectedKeys = new[] { "Active", "Inactive" };
+        string[] expectedKeys = ["Active", "Inactive"];
 
         // Act
-        var keys = TestStatus.Keys;
+        IReadOnlyCollection<string> keys = TestStatus.Keys;
 
         // Assert
         keys.Should().BeEquivalentTo(expectedKeys);
@@ -70,9 +70,9 @@ public class SmartEnumTests
     public void EqualityOperators_WorkCorrectly()
     {
         // Arrange
-        var status1 = TestStatus.Active;
-        var status2 = TestStatus.Active;
-        var status3 = TestStatus.Inactive;
+        TestStatus status1 = TestStatus.Active;
+        TestStatus status2 = TestStatus.Active;
+        TestStatus status3 = TestStatus.Inactive;
 
         // Act & Assert
         (status1 == status2).Should().BeTrue();
@@ -85,10 +85,10 @@ public class SmartEnumTests
     public void ToString_ReturnsValue()
     {
         // Arrange
-        var status = TestStatus.Active;
+        TestStatus status = TestStatus.Active;
 
         // Act
-        var result = status.ToString();
+        string result = status.ToString();
 
         // Assert
         result.Should().Be(status.Value);
@@ -98,10 +98,10 @@ public class SmartEnumTests
     public void Clone_ReturnsSameInstance()
     {
         // Arrange
-        var original = TestStatus.Active;
+        TestStatus original = TestStatus.Active;
 
         // Act
-        var cloned = original.Clone();
+        TestStatus cloned = original.Clone();
 
         // Assert
         cloned.Should().BeSameAs(original);
@@ -111,12 +111,12 @@ public class SmartEnumTests
     public void GetHashCode_IsConsistent()
     {
         // Arrange
-        var status1 = TestStatus.Active;
-        var status2 = TestStatus.Active;
+        TestStatus status1 = TestStatus.Active;
+        TestStatus status2 = TestStatus.Active;
 
         // Act
-        var hash1 = status1.GetHashCode();
-        var hash2 = status2.GetHashCode();
+        int hash1 = status1.GetHashCode();
+        int hash2 = status2.GetHashCode();
 
         // Assert
         hash1.Should().Be(hash2);
@@ -133,18 +133,18 @@ public class SmartEnumTests
 
         // Assert
         act.Should().Throw<SmartEnumException>()
-            .WithMessage($"{typeof(TestStatus).Name} cannot be null or empty.");
+            .WithMessage($"{nameof(TestStatus)} cannot be null or empty.");
     }
 
     [Fact]
     public void Parse_CaseInsensitiveString_ReturnsCorrectInstance()
     {
         // Arrange
-        var value = "aCtIvE";
-        var expected = TestStatus.Active;
+        string value = "aCtIvE";
+        TestStatus expected = TestStatus.Active;
 
         // Act
-        var result = TestStatus.Parse(value);
+        TestStatus result = TestStatus.Parse(value);
 
         // Assert
         result.Should().Be(expected);
@@ -154,7 +154,7 @@ public class SmartEnumTests
     public void Equals_WithNullOrDifferentType_ReturnsFalse()
     {
         // Arrange
-        var status = TestStatus.Active;
+        TestStatus? status = TestStatus.Active;
 
         // Act & Assert
         status.Equals(null).Should().BeFalse();
@@ -167,7 +167,7 @@ public class SmartEnumTests
         // Arrange
         TestStatus? status1 = null;
         TestStatus? status2 = null;
-        var status3 = TestStatus.Active;
+        TestStatus status3 = TestStatus.Active;
 
         // Act & Assert
         (status1 == status2).Should().BeTrue();
@@ -181,7 +181,7 @@ public class SmartEnumTests
     public void Operator_Equals_SymmetricWithTValue_Works()
     {
         // Arrange
-        var status = TestStatus.Active;
+        TestStatus status = TestStatus.Active;
         string value = "Active";
 
         // Act & Assert

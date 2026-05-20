@@ -16,18 +16,18 @@ public static class TestDataGenerator
 
     public static IEnumerable<object[]> GetInvalidStringValues()
     {
-        yield return new object[] { null! };
-        yield return new object[] { "" };
-        yield return new object[] { "   " };
-        yield return new object[] { "InvalidValue" };
-        yield return new object[] { "123" };
+        yield return [null!];
+        yield return [""];
+        yield return ["   "];
+        yield return ["InvalidValue"];
+        yield return ["123"];
     }
 
     public static IEnumerable<object[]> GetValidStringValues()
     {
-        yield return new object[] { "Active" };
-        yield return new object[] { "Inactive" };
-        yield return new object[] { "Read" };
-        yield return new object[] { "Write" };
+        yield return ["Active"];
+        yield return ["Inactive"];
+        yield return ["Read"];
+        yield return ["Write"];
     }
 }
