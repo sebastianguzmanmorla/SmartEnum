@@ -5,7 +5,7 @@ endif
 
 # Variables
 PROJECT_PATH=src/SebastianGuzmanMorla.SmartEnum/SebastianGuzmanMorla.SmartEnum.csproj
-PACK_OUTPUT=bin/Release
+PACK_OUTPUT=artifacts
 NUGET_SOURCE=https://api.nuget.org/v3/index.json
 
 # Comandos dependientes del sistema operativo

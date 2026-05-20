@@ -5,6 +5,7 @@ This document provides instructions, rules, and code patterns for AI coding assi
 ---
 
 ## 🚀 Core Capabilities
+
 * **Type-Safe Enumerations**: Replace traditional enums with object-oriented smart enums using `SmartEnum<TEnum, TValue>`.
 * **Automatic Lookup Generation**: A Source Generator automatically builds the static dictionary maps used for `Parse` and `TryParse` operations when classes are decorated with `[GenerateSmartEnum]`.
 * **Flag/Combinatorial Sets**: Combine values using `SmartEnumFlags<TFlags, TEnum, TValue>`.
@@ -18,6 +19,7 @@ This document provides instructions, rules, and code patterns for AI coding assi
 > When creating or editing a SmartEnum in the codebase, you MUST adhere to the following rules to ensure the source generator and runtime lookups work correctly.
 
 ### 1. SmartEnum Definition Structure
+
 * **Class Modifiers**: The SmartEnum class **must** be marked as `public sealed partial` or `public partial`.
 * **Inheritance**: It must inherit from `SmartEnum<TEnum, TValue>` where `TEnum` is the class itself and `TValue` is the underlying value type (which must be non-nullable, e.g., `string`, `int`, `Guid`).
 * **Source Generator Attribute**: The class **must** be decorated with `[GenerateSmartEnum]` from the `SebastianGuzmanMorla.SmartEnum.Attributes` namespace.
@@ -25,11 +27,13 @@ This document provides instructions, rules, and code patterns for AI coding assi
 * **Enum Options**: Define options as `public static readonly TEnum Name = new(value)`.
 
 ### 2. SmartEnumFlags Definition Structure
+
 * **Inheritance**: Inherit from `SmartEnumFlags<TFlags, TEnum, TValue>`.
 * **Constructor**: A public parameterless constructor is **required** so the flags parser can instantiate it.
 * **Storage/Format**: The flag combination is represented internally as a set of `TEnum` elements. The string representation is a space-separated string of the enum options.
 
 ### 3. Comparison and Equality
+
 * Use direct comparison operators `==` and `!=`. The library overloads these operators to compare:
   * Two `SmartEnum` instances (`enum1 == enum2`).
   * A `SmartEnum` instance and its underlying value type (`enum1 == "value"` or `"value" == enum1`).
@@ -40,6 +44,7 @@ This document provides instructions, rules, and code patterns for AI coding assi
 ## 📖 Code Templates
 
 ### Basic SmartEnum Definition
+
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
@@ -62,6 +67,7 @@ public sealed partial class UserStatus : SmartEnum<UserStatus, string>
 ```
 
 ### SmartEnumFlags Definition
+
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
@@ -102,6 +108,7 @@ public class PermissionSet : SmartEnumFlags<PermissionSet, Permission, string>
 ## 🔄 Common Operations
 
 ### Parsing Enums
+
 ```csharp
 // Exact value parsing (returns the SmartEnum instance or throws SmartEnumException)
 UserStatus status = UserStatus.Parse("active");
@@ -117,6 +124,7 @@ if (UserStatus.TryParse("suspended", out var suspendedStatus))
 ```
 
 ### Working with Flags
+
 ```csharp
 // Parse from space- or comma-separated string
 var permissions = PermissionSet.Parse("read, write");
