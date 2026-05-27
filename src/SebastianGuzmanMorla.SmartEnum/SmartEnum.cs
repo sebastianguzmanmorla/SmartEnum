@@ -85,6 +85,11 @@ public abstract class SmartEnum<TEnum, TValue>(TValue value)
         return obj is TEnum other && EqualityComparer<TValue>.Default.Equals(Value, other.Value);
     }
 
+    public static implicit operator TValue(SmartEnum<TEnum, TValue> smartEnum)
+    {
+        return smartEnum.Value;
+    }
+
     public static bool operator ==(SmartEnum<TEnum, TValue>? a, SmartEnum<TEnum, TValue>? b)
     {
         return ReferenceEquals(a, b)
@@ -92,27 +97,7 @@ public abstract class SmartEnum<TEnum, TValue>(TValue value)
                    EqualityComparer<TValue>.Default.Equals(a.Value, b.Value));
     }
 
-    public static bool operator ==(TValue a, SmartEnum<TEnum, TValue> b)
-    {
-        return a.Equals(b.Value);
-    }
-
-    public static bool operator ==(SmartEnum<TEnum, TValue> a, TValue b)
-    {
-        return b == a;
-    }
-
     public static bool operator !=(SmartEnum<TEnum, TValue>? a, SmartEnum<TEnum, TValue>? b)
-    {
-        return !(a == b);
-    }
-
-    public static bool operator !=(TValue a, SmartEnum<TEnum, TValue> b)
-    {
-        return !(a == b);
-    }
-
-    public static bool operator !=(SmartEnum<TEnum, TValue> a, TValue b)
     {
         return !(a == b);
     }
