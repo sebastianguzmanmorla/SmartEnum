@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
+namespace SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.Converters;
 
 public sealed class SmartEnumFlagsValueConverter<TFlags, TEnum, TValue>() : ValueConverter<TFlags, string>
 (

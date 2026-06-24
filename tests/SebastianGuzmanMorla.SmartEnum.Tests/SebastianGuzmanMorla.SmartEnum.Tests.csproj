@@ -11,6 +11,7 @@
     <!-- Import the source generator from the main library -->
     <ItemGroup>
         <ProjectReference Include="..\SebastianGuzmanMorla.SmartEnum.Tests.Types\SebastianGuzmanMorla.SmartEnum.Tests.Types.csproj" />
+        <ProjectReference Include="..\..\src\SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore\SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.csproj" />
         <ProjectReference Include="..\..\src\SebastianGuzmanMorla.SmartEnum.Generator\SebastianGuzmanMorla.SmartEnum.Generator.csproj" />
     </ItemGroup>
 

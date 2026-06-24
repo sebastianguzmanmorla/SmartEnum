@@ -1,148 +1,252 @@
 # SebastianGuzmanMorla.SmartEnum
 
-Implementación de SmartEnums en .NET con soporte para Source Generators, Entity Framework Core y System.Text.Json.
+A modern, high-performance, and feature-rich Smart Enum (strongly typed enum) implementation for .NET. This library leverages **Source Generators** to automatically build lookup tables at compile time, eliminating reflection overhead. It also includes first-class support for **Entity Framework Core** and **System.Text.Json**.
 
-## Descripción
+[![NuGet Version](https://img.shields.io/nuget/v/SebastianGuzmanMorla.SmartEnum.svg)](https://www.nuget.org/packages/SebastianGuzmanMorla.SmartEnum)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-`SebastianGuzmanMorla.SmartEnum` ofrece una forma moderna de definir enumeraciones de tipo seguro con valores personalizados, parseo robusto, comparación, flags y generación automática de mapas internos.
+---
 
-- Soporta `SmartEnum<TEnum, TValue>` para enums con valores de cualquier tipo no anulable.
-- Incluye `SmartEnumFlags<TFlags, TEnum, TValue>` para trabajar con conjuntos de valores.
-- Genera automáticamente la tabla de lookup usando el atributo `[GenerateSmartEnum]`.
-- Incluye conversores para `System.Text.Json` y `Entity Framework Core`.
+## Key Features
 
-## Instalación
+- 🚀 **Zero Reflection**: Compile-time lookup tables generated via Source Generators using the `[GenerateSmartEnum]` attribute.
+- 🔒 **Type-Safe Enumerations**: Replace primitive enums with robust, object-oriented classes containing behavior and custom properties.
+- 📦 **Generic Underlying Values**: Supports any non-nullable value type (`string`, `int`, `Guid`, custom types, etc.) as the underlying key.
+- 🏷️ **SmartEnum Flags**: Combine and manipulate sets of enums with `SmartEnumFlags<TFlags, TEnum, TValue>`—perfect for permissions, roles, and configuration sets.
+- ⚙️ **Operators Overloading**: Built-in implicit conversions, direct equality (`==`, `!=`), and bitwise operators (`|`, `-`) for flag sets.
+- 🌐 **JSON Serialization**: Direct serialization to and from the underlying value type using `System.Text.Json` converters.
+- 💾 **Entity Framework Core Support**: Out-of-the-box converters and value comparers for seamless database persistence.
 
-Instala el paquete desde NuGet:
+---
+
+## Installation
+
+Install the core package containing the SmartEnum base classes, Source Generator, and JSON converters:
 
 ```bash
 dotnet add package SebastianGuzmanMorla.SmartEnum
 ```
 
-## Compatibilidad
+If you are using Entity Framework Core, install the EF Core integration package:
 
-- Target frameworks: `net8.0`, `net9.0`, `net10.0`
-- Generador de código: compatible con `netstandard2.0`
-- Dependencia de EF Core: `Microsoft.EntityFrameworkCore` (>= v8.0.0)
+```bash
+dotnet add package SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore
+```
 
-## Uso básico
+### Compatibility
 
-Define tu enum heredando de `SmartEnum<TEnum, TValue>` y aplica el atributo `[GenerateSmartEnum]`.
+- **Target Frameworks**: `.NET 8.0`, `.NET 9.0`, `.NET 10.0`
+- **Source Generator**: Compatible with any project targeting `netstandard2.0` or higher
+- **EF Core Dependency**: `Microsoft.EntityFrameworkCore` (>= v8.0.0)
+
+---
+
+## Basic Usage
+
+### 1. Define a SmartEnum
+
+To create a smart enum, inherit from `SmartEnum<TEnum, TValue>`, declare your values as `public static readonly` fields, and decorate the class with `[GenerateSmartEnum]`. The class **must** be marked as `partial`.
 
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
+using System.Text.Json.Serialization;
 using SebastianGuzmanMorla.SmartEnum.Converters.Json;
 
-[JsonConverter(typeof(SmartEnumJsonConverter<Color, string>))]
-[GenerateSmartEnum]
-public sealed partial class Color : SmartEnum<Color, string>
-{
-    public static readonly Color Red = new("red");
-    public static readonly Color Green = new("green");
-    public static readonly Color Blue = new("blue");
+namespace MyDomain.Enums;
 
-    private Color(string value) : base(value)
+[JsonConverter(typeof(SmartEnumJsonConverter<SubscriptionTier, string>))]
+[GenerateSmartEnum]
+public sealed partial class SubscriptionTier : SmartEnum<SubscriptionTier, string>
+{
+    public static readonly SubscriptionTier Free = new("free", price: 0.00, maxProjects: 3);
+    public static readonly SubscriptionTier Professional = new("pro", price: 19.99, maxProjects: 20);
+    public static readonly SubscriptionTier Enterprise = new("enterprise", price: 99.99, maxProjects: int.MaxValue);
+
+    // Custom properties
+    public double Price { get; }
+    public int MaxProjects { get; }
+
+    private SubscriptionTier(string value, double price, int maxProjects) : base(value)
     {
+        Price = price;
+        MaxProjects = maxProjects;
     }
 }
 ```
 
-El generador crea internamente la tabla de lookup necesaria para `Parse` y `TryParse`.
+> [!NOTE]
+> The Source Generator will scan classes annotated with `[GenerateSmartEnum]` and generate the static lookup dictionary needed for fast, reflection-free parsing.
+
+### 2. Equality and Comparison
+
+You can compare SmartEnums directly with each other or directly with their underlying values using `==` and `!=`.
 
 ```csharp
-Color selected = Color.Parse("green");
-if (Color.TryParse("blue", out Color? result))
+SubscriptionTier myTier = SubscriptionTier.Professional;
+
+// Direct object comparison
+bool isPro = myTier == SubscriptionTier.Professional; // true
+
+// Comparison with the underlying value (implicit conversion is supported)
+bool isProValue = myTier == "pro"; // true
+```
+
+### 3. Parsing and TryParse
+
+Convert underlying values or string representations back to the SmartEnum instance safely and efficiently.
+
+```csharp
+// 1. Parsing by value (throws SmartEnumException if not found)
+SubscriptionTier tier = SubscriptionTier.Parse("pro");
+
+// 2. Case-insensitive parsing by name (throws SmartEnumException if not found)
+SubscriptionTier tierByName = SubscriptionTier.Parse("Professional");
+
+// 3. Safe TryParse by value
+if (SubscriptionTier.TryParse("enterprise", out var enterpriseTier))
 {
-    Console.WriteLine(result); // blue
+    Console.WriteLine($"Max projects: {enterpriseTier.MaxProjects}");
 }
 ```
 
-## Uso de SmartEnumFlags
+---
 
-`SmartEnumFlags` permite combinar y comparar conjuntos de valores.
+## Working with SmartEnumFlags
+
+For flag-like enums (like bitwise combinations of permissions or options), the library provides `SmartEnumFlags`.
+
+### 1. Define the Flags and Flag Set
 
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
+using System.Text.Json.Serialization;
 using SebastianGuzmanMorla.SmartEnum.Converters.Json;
 
-[JsonConverter(typeof(SmartEnumJsonConverter<Permission, string>))]
+namespace MyDomain.Enums;
+
+// A. Define the individual flags
+[JsonConverter(typeof(SmartEnumJsonConverter<UserPermission, string>))]
 [GenerateSmartEnum]
-public partial class Permission : SmartEnum<Permission, string>
+public sealed partial class UserPermission : SmartEnum<UserPermission, string>
 {
-    public static readonly Permission Read = new("read");
-    public static readonly Permission Write = new("write");
-    public static readonly Permission Delete = new("delete");
+    public static readonly UserPermission Read = new("read");
+    public static readonly UserPermission Write = new("write");
+    public static readonly UserPermission Delete = new("delete");
+    public static readonly UserPermission Admin = new("admin");
 
-    private Permission(string value) : base(value) { }
+    private UserPermission(string value) : base(value) { }
 }
 
-[JsonConverter(typeof(SmartEnumFlagsJsonConverter<PermissionSet, Permission, string>))]
-public class PermissionSet : SmartEnumFlags<PermissionSet, Permission, string>
+// B. Define the set container (requires a public parameterless constructor)
+[JsonConverter(typeof(SmartEnumFlagsJsonConverter<UserPermissionSet, UserPermission, string>))]
+public class UserPermissionSet : SmartEnumFlags<UserPermissionSet, UserPermission, string>
 {
-    public PermissionSet() { }
-}
+    // Required for deserialization and parsing
+    public UserPermissionSet() : base() { }
 
-var flags = PermissionSet.Parse(["read", "write"]);
-if (flags.Has(Permission.Read))
-{
-    Console.WriteLine("Tiene permiso de lectura");
+    // Optional convenience constructor
+    public UserPermissionSet(params UserPermission[] permissions) : base(permissions) { }
 }
 ```
 
-## Conversores JSON
+### 2. Flag Set Operations
 
-Agrega los conversores de `System.Text.Json` para serializar y deserializar `SmartEnum` y `SmartEnumFlags`.
+Modify and inspect the flag sets using clean operators and helper methods:
+
+```csharp
+// Parse from space-separated or comma-separated values
+var permissions = UserPermissionSet.Parse("read, write");
+
+// Check if a single flag is present
+if (permissions.Has(UserPermission.Read))
+{
+    Console.WriteLine("User can read.");
+}
+
+// Add/Remove flags using bitwise-like operators (creates a new cloned instance)
+permissions = permissions | UserPermission.Delete; // adds 'delete'
+permissions = permissions - UserPermission.Read;   // removes 'read'
+
+// Mutate set directly (in-place modification)
+permissions.Add(UserPermission.Admin);
+permissions.Remove(UserPermission.Write);
+
+// Checks
+bool hasAll = permissions.ContainsAll(new UserPermissionSet(UserPermission.Delete, UserPermission.Admin));
+bool exactMatch = permissions.EqualsAll(UserPermission.Delete, UserPermission.Admin);
+
+// Representation
+Console.WriteLine(permissions.ToString()); // "admin delete" (space-separated, ordered by value)
+```
+
+---
+
+## JSON Serialization
+
+To serialize and deserialize SmartEnums using `System.Text.Json`, use the `SmartEnumJsonConverter` and `SmartEnumFlagsJsonConverter`.
+
+### Direct Property Serialization
+Apply `[JsonConverter]` attributes directly on the class definitions (as shown in the code examples above) or register them globally:
 
 ```csharp
 using System.Text.Json;
 using SebastianGuzmanMorla.SmartEnum.Converters.Json;
 
 var options = new JsonSerializerOptions();
-options.Converters.Add(new SmartEnumJsonConverter<Color, string>());
+options.Converters.Add(new SmartEnumJsonConverter<SubscriptionTier, string>());
+options.Converters.Add(new SmartEnumFlagsJsonConverter<UserPermissionSet, UserPermission, string>());
 
-var json = JsonSerializer.Serialize(Color.Red, options);
-var color = JsonSerializer.Deserialize<Color>(json, options);
+string json = JsonSerializer.Serialize(SubscriptionTier.Professional, options); // Output: "pro"
+SubscriptionTier tier = JsonSerializer.Deserialize<SubscriptionTier>(json, options)!;
 ```
 
-Para flags:
+---
 
-```csharp
-options.Converters.Add(new SmartEnumFlagsJsonConverter<PermissionSet, Permission, string>());
-```
+## Entity Framework Core Integration
 
-## Conversores Entity Framework Core
+To store `SmartEnum` or `SmartEnumFlags` properties in your database, configure the conventions in your `DbContext`. The converters map the smart enums to/from their underlying database type (e.g., storing a `string` or an `int` in the table).
 
-Registra los conversores para mapear `SmartEnum` y `SmartEnumFlags` en modelos de EF Core.
+Install the `SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore` package and override `ConfigureConventions`:
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
+using MyDomain.Enums;
 
-protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+namespace MyInfrastructure;
+
+public class ApplicationDbContext : DbContext
 {
-    base.ConfigureConventions(configurationBuilder);
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-    configurationBuilder.Properties<Color>()
-        .HaveConversion<SmartEnumConverter<Color, string>, SmartEnumComparer<Color, string>>()
-        .HaveColumnType("text");
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        // Map SmartEnum to DB column (maps to Text in database)
+        configurationBuilder.Properties<SubscriptionTier>()
+            .HaveConversion<SmartEnumConverter<SubscriptionTier, string>, SmartEnumComparer<SubscriptionTier, string>>()
+            .HaveColumnType("varchar(50)");
+
+        // Map SmartEnumFlags to DB column (maps to Text in database as space-separated values)
+        configurationBuilder.Properties<UserPermissionSet>()
+            .HaveConversion<SmartEnumFlagsValueConverter<UserPermissionSet, UserPermission, string>,
+                            SmartEnumFlagsValueComparer<UserPermissionSet, UserPermission, string>>()
+            .HaveColumnType("varchar(500)");
+    }
 }
 ```
 
-Para flags:
+---
 
-```csharp
-configurationBuilder.Properties<PermissionSet>()
-    .HaveConversion<SmartEnumFlagsValueConverter<PermissionSet, Permission, string>,
-        SmartEnumFlagsValueComparer<PermissionSet, Permission, string>>()
-    .HaveColumnType("text");
-```
+## Exceptions
 
-## Excepciones
+The library throws `SmartEnumException` when validation or parsing fails. This exception inherits from `Exception` and provides details about the invalid lookup values.
 
-El paquete incluye `SmartEnumException` para manejar errores de parseo y valores inválidos.
+---
 
-## Licencia
+## License
 
-Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
