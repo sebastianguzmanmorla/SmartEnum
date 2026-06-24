@@ -1,36 +1,37 @@
 # SebastianGuzmanMorla.SmartEnum - AI Agent Guidelines
 
-This document provides instructions, rules, and code patterns for AI coding assistants (LLMs, Copilot, Cursor, etc.) to correctly implement, extend, and consume the `SebastianGuzmanMorla.SmartEnum` library.
+This document provides instructions, rules, and code patterns for AI coding assistants (LLMs, Copilot, Cursor, etc.) to correctly implement, extend, and consume the `SebastianGuzmanMorla.SmartEnum` library within this codebase.
 
 ---
 
 ## 🚀 Core Capabilities
 
-* **Type-Safe Enumerations**: Replace traditional enums with object-oriented smart enums using `SmartEnum<TEnum, TValue>`.
-* **Automatic Lookup Generation**: A Source Generator automatically builds the static dictionary maps used for `Parse` and `TryParse` operations when classes are decorated with `[GenerateSmartEnum]`.
-* **Flag/Combinatorial Sets**: Combine values using `SmartEnumFlags<TFlags, TEnum, TValue>`.
-* **Built-in Converters**: Fully compatible with `System.Text.Json` and `Entity Framework Core`.
+* **Type-Safe Enumerations**: Replace traditional C# `enum`s with object-oriented smart enums using `SmartEnum<TEnum, TValue>`.
+* **Reflection-Free Lookups**: A Source Generator automatically builds static dictionary maps used for `Parse` and `TryParse` operations at compile time when classes are decorated with `[GenerateSmartEnum]`.
+* **Flag/Combinatorial Sets**: Group and manipulate sets of enums using `SmartEnumFlags<TFlags, TEnum, TValue>`.
+* **First-Class Serialization & Persistence**: Fully compatible with `System.Text.Json` and `Entity Framework Core`.
 
 ---
 
 ## 🛠️ Implementation Rules for AI Agents
 
 > [!IMPORTANT]
-> When creating or editing a SmartEnum in the codebase, you MUST adhere to the following rules to ensure the source generator and runtime lookups work correctly.
+> When creating or editing a SmartEnum in the codebase, you MUST adhere to the following rules to ensure the source generator compile-time lookups and runtime behavior work correctly.
 
 ### 1. SmartEnum Definition Structure
 
 * **Class Modifiers**: The SmartEnum class **must** be marked as `public sealed partial` or `public partial`.
 * **Inheritance**: It must inherit from `SmartEnum<TEnum, TValue>` where `TEnum` is the class itself and `TValue` is the underlying value type (which must be non-nullable, e.g., `string`, `int`, `Guid`).
 * **Source Generator Attribute**: The class **must** be decorated with `[GenerateSmartEnum]` from the `SebastianGuzmanMorla.SmartEnum.Attributes` namespace.
-* **Constructor**: Define a `private` or `protected` constructor taking a parameter of type `TValue` and passing it to the base constructor: `base(value)`.
-* **Enum Options**: Define options as `public static readonly TEnum Name = new(value)`.
+* **Constructor**: Define a `private` or `protected` constructor taking a parameter of type `TValue` (along with any other custom properties) and passing the value to the base constructor: `base(value)`.
+* **Enum Options**: Define options as `public static readonly TEnum Name = new(value, ...Properties)`.
 
 ### 2. SmartEnumFlags Definition Structure
 
 * **Inheritance**: Inherit from `SmartEnumFlags<TFlags, TEnum, TValue>`.
-* **Constructor**: A public parameterless constructor is **required** so the flags parser can instantiate it.
+* **Constructor**: A public parameterless constructor is **required** so the flags parser and JSON deserializer can instantiate it.
 * **Storage/Format**: The flag combination is represented internally as a set of `TEnum` elements. The string representation is a space-separated string of the enum options.
+* **Helper Constructor**: Provide a constructor overload taking `params TEnum[]` to simplify initialization.
 
 ### 3. Comparison and Equality
 
@@ -48,6 +49,7 @@ This document provides instructions, rules, and code patterns for AI coding assi
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
+using System.Text.Json.Serialization;
 using SebastianGuzmanMorla.SmartEnum.Converters.Json;
 
 namespace MyProject.Domain;
@@ -71,6 +73,7 @@ public sealed partial class UserStatus : SmartEnum<UserStatus, string>
 ```csharp
 using SebastianGuzmanMorla.SmartEnum;
 using SebastianGuzmanMorla.SmartEnum.Attributes;
+using System.Text.Json.Serialization;
 using SebastianGuzmanMorla.SmartEnum.Converters.Json;
 
 namespace MyProject.Domain;
@@ -138,9 +141,13 @@ bool canWrite = permissions.Has(Permission.Write);
 // Check if all requested flags are present
 bool isSuperUser = permissions.ContainsAll(new PermissionSet(Permission.Read, Permission.Write, Permission.Delete));
 
-// Adding/Removing flags (returns a new cloned instance or mutates)
-var updatedPermissions = permissions.CloneAdd(Permission.Delete);
-var fewerPermissions = permissions.CloneRemove(Permission.Read);
+// Adding/Removing flags (returns a new cloned instance)
+var updatedPermissions = permissions | Permission.Delete; // via bitwise-like operator
+var fewerPermissions = permissions - Permission.Read;     // via subtraction operator
+
+// In-place mutation (modifies the current instance directly)
+permissions.Add(UserPermission.Write);
+permissions.Remove(UserPermission.Read);
 ```
 
 ---
@@ -162,16 +169,16 @@ public class MyDbContext : DbContext
     {
         base.ConfigureConventions(configurationBuilder);
 
-        // Register standard SmartEnum Conversion
+        // Register standard SmartEnum Conversion (stores underlying value type in DB)
         configurationBuilder.Properties<UserStatus>()
             .HaveConversion<SmartEnumConverter<UserStatus, string>, SmartEnumComparer<UserStatus, string>>()
-            .HaveColumnType("text");
+            .HaveColumnType("varchar(50)");
 
-        // Register SmartEnumFlags Conversion
+        // Register SmartEnumFlags Conversion (stores space-separated string of values in DB)
         configurationBuilder.Properties<PermissionSet>()
             .HaveConversion<SmartEnumFlagsValueConverter<PermissionSet, Permission, string>, 
                             SmartEnumFlagsValueComparer<PermissionSet, Permission, string>>()
-            .HaveColumnType("text");
+            .HaveColumnType("varchar(500)");
     }
 }
 ```

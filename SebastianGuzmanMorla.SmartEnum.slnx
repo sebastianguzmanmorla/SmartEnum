@@ -6,6 +6,7 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="src\SebastianGuzmanMorla.SmartEnum.Generator\SebastianGuzmanMorla.SmartEnum.Generator.csproj" />
+  <Project Path="src\SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore\SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.csproj" />
   <Project Path="src\SebastianGuzmanMorla.SmartEnum\SebastianGuzmanMorla.SmartEnum.csproj" />
   <Project Path="tests\SebastianGuzmanMorla.SmartEnum.Tests.Types\SebastianGuzmanMorla.SmartEnum.Tests.Types.csproj" />
   <Project Path="tests\SebastianGuzmanMorla.SmartEnum.Tests\SebastianGuzmanMorla.SmartEnum.Tests.csproj" />

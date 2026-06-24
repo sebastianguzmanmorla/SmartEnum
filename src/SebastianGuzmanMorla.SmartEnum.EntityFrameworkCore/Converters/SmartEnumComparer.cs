@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
+namespace SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.Converters;
 
 public sealed class SmartEnumComparer<TEnum, TValue>() : ValueComparer<TEnum>
 (

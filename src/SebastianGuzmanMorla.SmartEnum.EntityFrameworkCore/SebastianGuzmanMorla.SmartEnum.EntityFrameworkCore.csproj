@@ -6,16 +6,16 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageOutputPath>$(MSBuildThisFileDirectory)../../artifacts/</PackageOutputPath>
-        <PackageId>SebastianGuzmanMorla.SmartEnum</PackageId>
+        <PackageId>SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore</PackageId>
         <Version>1.0.6</Version>
         <Authors>Sebastián Guzmán Morla</Authors>
-        <Description>Implementación de SmartEnums con Source Generators.</Description>
+        <Description>Integración de SmartEnums con Entity Framework Core (converters y comparers).</Description>
         <PackageProjectUrl>https://github.com/sebastianguzmanmorla/SmartEnum</PackageProjectUrl>
         <RepositoryUrl>https://github.com/sebastianguzmanmorla/SmartEnum.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <PackageTags>smart-enum;source-generator;enum;csharp;dotnet;json</PackageTags>
+        <PackageTags>smart-enum;enum;csharp;dotnet;entity-framework;efcore</PackageTags>
         <Copyright>© 2026 Sebastián Guzmán Morla</Copyright>
     </PropertyGroup>
 
@@ -25,30 +25,20 @@
         <None Include="..\..\AGENTS.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
-    <Target Name="PrintVersion">
-        <Error Text="$(Version)"/>
-    </Target>
-
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SebastianGuzmanMorla.SmartEnum.Generator\SebastianGuzmanMorla.SmartEnum.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\SebastianGuzmanMorla.SmartEnum.Generator\bin\$(Configuration)\netstandard2.0\SebastianGuzmanMorla.SmartEnum.Generator.dll" 
-              Pack="true" 
-              PackagePath="analyzers/dotnet/cs" />
+        <ProjectReference Include="..\SebastianGuzmanMorla.SmartEnum\SebastianGuzmanMorla.SmartEnum.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-using SebastianGuzmanMorla.SmartEnum.Converters.EntityFrameworkCore;
+using SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.Converters;
 using SebastianGuzmanMorla.SmartEnum.Tests.Types;
 
 namespace SebastianGuzmanMorla.SmartEnum.Tests.UnitTests;

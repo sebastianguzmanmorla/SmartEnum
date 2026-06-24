@@ -4,7 +4,9 @@ ifneq ("$(wildcard .env)","")
 endif
 
 # Variables
-PROJECT_PATH=src/SebastianGuzmanMorla.SmartEnum/SebastianGuzmanMorla.SmartEnum.csproj
+SOLUTION_PATH=SebastianGuzmanMorla.SmartEnum.slnx
+CORE_PROJECT=src/SebastianGuzmanMorla.SmartEnum/SebastianGuzmanMorla.SmartEnum.csproj
+EF_PROJECT=src/SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore/SebastianGuzmanMorla.SmartEnum.EntityFrameworkCore.csproj
 PACK_OUTPUT=artifacts
 NUGET_SOURCE=https://api.nuget.org/v3/index.json
 
@@ -25,15 +27,16 @@ endif
 clean:
 	@echo "Limpiando binarios..."
 	@-$(RM_DIR)
-	@dotnet clean $(PROJECT_PATH) -c Release
+	@dotnet clean $(SOLUTION_PATH) -c Release
 
 build:
-	@echo "Compilando SebastianGuzmanMorla.SmartEnum..."
-	@dotnet build $(PROJECT_PATH) -c Release
+	@echo "Compilando solución SmartEnum..."
+	@dotnet build $(SOLUTION_PATH) -c Release
 
-pack: clean build
-	@echo "Empaquetando SebastianGuzmanMorla.SmartEnum..."
-	@dotnet pack $(PROJECT_PATH) -c Release -o $(PACK_OUTPUT)
+pack: clean
+	@echo "Empaquetando proyectos..."
+	@dotnet pack $(CORE_PROJECT) -c Release -o $(PACK_OUTPUT)
+	@dotnet pack $(EF_PROJECT) -c Release -o $(PACK_OUTPUT)
 
 push: check-env pack
 	@echo "Publicando en NuGet..."
