@@ -58,6 +58,7 @@ public sealed class SmartEnumGenerator : IIncrementalGenerator
 
                           namespace {{ns}};
 
+                          [System.ComponentModel.TypeConverter(typeof(SebastianGuzmanMorla.SmartEnum.Converters.SmartEnumTypeConverter<{{name}}, {{valueTypeName}}>))]
                           partial class {{name}}
                           {
                               static {{name}}()
