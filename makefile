@@ -33,7 +33,7 @@ build:
 	@echo "Compilando solución SmartEnum..."
 	@dotnet build $(SOLUTION_PATH) -c Release
 
-pack: clean
+pack: clean build
 	@echo "Empaquetando proyectos..."
 	@dotnet pack $(CORE_PROJECT) -c Release -o $(PACK_OUTPUT)
 	@dotnet pack $(EF_PROJECT) -c Release -o $(PACK_OUTPUT)
