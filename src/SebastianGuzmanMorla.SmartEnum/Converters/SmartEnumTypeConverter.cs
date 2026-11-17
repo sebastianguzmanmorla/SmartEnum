@@ -21,7 +21,7 @@ public class SmartEnumTypeConverter<TEnum, TValue> : TypeConverter
             {
                 return null;
             }
-            return SmartEnum<TEnum, TValue>.Parse(stringValue);
+            return SmartEnum<TEnum, TValue>.ParseText(stringValue, preferUnderlyingKey: false);
         }
         return base.ConvertFrom(context, culture, value);
     }

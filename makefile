@@ -1,8 +1,3 @@
-# Cargar variables desde .env si existe
-ifneq ("$(wildcard .env)","")
-    include .env
-endif
-
 # Variables
 SOLUTION_PATH=SebastianGuzmanMorla.SmartEnum.slnx
 CORE_PROJECT=src/SebastianGuzmanMorla.SmartEnum/SebastianGuzmanMorla.SmartEnum.csproj
@@ -17,12 +12,8 @@ else
     RM_DIR = rm -rf $(PACK_OUTPUT)
 endif
 
-.PHONY: clean pack push check-env
-
-check-env:
-ifndef API_KEY
-	$(error API_KEY no encontrada. Asegurate de tener un archivo .env con API_KEY=xxx)
-endif
+.DEFAULT_GOAL := build
+.PHONY: clean build pack push
 
 clean:
 	@echo "Limpiando binarios..."
@@ -38,9 +29,9 @@ pack: clean build
 	@dotnet pack $(CORE_PROJECT) -c Release -o $(PACK_OUTPUT)
 	@dotnet pack $(EF_PROJECT) -c Release -o $(PACK_OUTPUT)
 
-push: check-env pack
+# Configure the publishing key in NuGet, or set NUGET_API_KEY with NuGet 7.6+.
+push: pack
 	@echo "Publicando en NuGet..."
 	@dotnet nuget push $(PACK_OUTPUT)/*.nupkg \
-		--api-key $(API_KEY) \
 		--source $(NUGET_SOURCE) \
 		--skip-duplicate

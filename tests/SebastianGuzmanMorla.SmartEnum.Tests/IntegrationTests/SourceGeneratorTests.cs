@@ -172,6 +172,7 @@ namespace TestNamespace
         PortableExecutableReference[] references =
         [
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.ComponentModel.TypeConverterAttribute).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(SmartEnum<,>).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(GenerateSmartEnumAttribute).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(System.Collections.Frozen.FrozenDictionary).Assembly.Location)

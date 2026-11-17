@@ -17,6 +17,21 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
         _flags = [];
     }
 
+    internal static TFlags CreateEmpty()
+    {
+        TFlags instance = new();
+        instance._flags.Clear();
+        return instance;
+    }
+
+    internal static string ToDelimitedValue(TEnum flag, string? text, bool preferUnderlyingKey)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.IndexOfAny([' ', ',']) >= 0
+            || SmartEnum<TEnum, TValue>.ParseText(text, preferUnderlyingKey) != flag)
+            throw new SmartEnumException($"{typeof(TEnum).Name} cannot be represented safely as a delimited flag value.");
+        return text;
+    }
+
     public IReadOnlyCollection<TEnum> Flags => _flags;
 
     public bool Equals(TFlags? x, TFlags? y)
@@ -36,13 +51,13 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public static TFlags Parse(string? raw)
     {
-        TFlags instance = new();
+        TFlags instance = CreateEmpty();
 
         string[] parts = raw?.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries) ?? [];
 
         foreach (string part in parts)
         {
-            TEnum value = SmartEnum<TEnum, TValue>.Parse(part);
+            TEnum value = SmartEnum<TEnum, TValue>.ParseText(part, preferUnderlyingKey: false);
 
             if (!instance._flags.Add(value))
             {
@@ -55,7 +70,7 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public static TFlags Parse(TValue[] parts)
     {
-        TFlags instance = new();
+        TFlags instance = CreateEmpty();
 
         foreach (TValue part in parts)
         {
@@ -84,10 +99,7 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public TFlags CloneAdd(TEnum flag)
     {
-        TFlags copy = new();
-        foreach (TEnum f in _flags)
-            copy._flags.Add(f);
-
+        TFlags copy = Clone();
         copy._flags.Add(flag);
         return copy;
     }
@@ -99,10 +111,7 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public TFlags CloneRemove(TEnum flag)
     {
-        TFlags copy = new();
-        foreach (TEnum f in _flags)
-            copy._flags.Add(f);
-
+        TFlags copy = Clone();
         copy._flags.Remove(flag);
         return copy;
     }
@@ -114,7 +123,8 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public override string ToString()
     {
-        return string.Join(" ", _flags.OrderBy(x => x.Value).Select(f => f.ToString()));
+        return string.Join(" ", _flags.OrderBy(x => x.Value)
+            .Select(flag => ToDelimitedValue(flag, flag.ToString(), preferUnderlyingKey: false)));
     }
 
     public TValue[] ToValueArray()
@@ -134,9 +144,9 @@ public abstract class SmartEnumFlags<TFlags, TEnum, TValue> : IEquatable<TFlags>
 
     public TFlags Clone()
     {
-        TFlags copy = new();
-
-        return _flags.Aggregate(copy, (current, f) => current.CloneAdd(f));
+        TFlags copy = CreateEmpty();
+        copy._flags.UnionWith(_flags);
+        return copy;
     }
 
     public static TFlags operator |(SmartEnumFlags<TFlags, TEnum, TValue> a, TEnum b)

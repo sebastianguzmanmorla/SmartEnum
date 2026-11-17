@@ -49,19 +49,43 @@ public abstract class SmartEnum<TEnum, TValue>(TValue value)
             : throw new SmartEnumException($"Invalid {typeof(TEnum).Name}: {value}");
     }
 
-    public static TEnum Parse(string value)
+    public static TEnum Parse(string value) => ParseText(value, preferUnderlyingKey: true);
+
+    internal static TEnum ParseText(string value, bool preferUnderlyingKey)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
             throw new SmartEnumException($"{typeof(TEnum).Name} cannot be null or empty.");
         }
 
-        foreach (TEnum e in EnsureLookupInitialized().Values)
-            if (string.Equals(e.ToString(), value, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return e;
-            }
+        FrozenDictionary<TValue, TEnum> lookup = EnsureLookupInitialized();
+        if (preferUnderlyingKey && value is TValue key && lookup.TryGetValue(key, out TEnum? keyed)
+            && EqualityComparer<TValue>.Default.Equals(keyed.Value, key))
+            return keyed;
 
+        TEnum? exact = null;
+        TEnum? insensitive = null;
+        bool ambiguousExact = false;
+        bool ambiguousInsensitive = false;
+        foreach (TEnum e in lookup.Values)
+        {
+            string text = e.ToString();
+            if (string.Equals(text, value, StringComparison.Ordinal))
+            {
+                ambiguousExact |= exact is not null;
+                exact = e;
+            }
+            if (string.Equals(text, value, StringComparison.InvariantCultureIgnoreCase))
+            {
+                ambiguousInsensitive |= insensitive is not null;
+                insensitive = e;
+            }
+        }
+
+        if (!ambiguousExact && exact is not null)
+            return exact;
+        if (exact is null && !ambiguousInsensitive && insensitive is not null)
+            return insensitive;
         throw new SmartEnumException($"Invalid {typeof(TEnum).Name}: {value}");
     }
 
